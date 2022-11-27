@@ -487,6 +487,21 @@ func (s *StepMobileUIValidation) AssertImageNotExists(expectedImagePath string, 
 	return s
 }
 
+func (s *StepMobileUIValidation) AssertScenarioType(scenarioType string, msg ...string) *StepMobileUIValidation {
+	v := Validator{
+		Check:  uixt.ScenarioType,
+		Assert: uixt.AssertionExists,
+		Expect: scenarioType,
+	}
+	if len(msg) > 0 {
+		v.Message = msg[0]
+	} else {
+		v.Message = fmt.Sprintf("cv image [%s] not found", scenarioType)
+	}
+	s.step.Validators = append(s.step.Validators, v)
+	return s
+}
+
 func (s *StepMobileUIValidation) Name() string {
 	return s.step.Name
 }
@@ -629,7 +644,7 @@ func runStepMobileUI(s *SessionRunner, step *TStep) (stepResult *StepResult, err
 	}
 
 	// validate
-	validateResults, err := validateUI(uiDriver, step.Validators)
+	validateResults, err := validateUI(uiDriver, step.Validators, s.caseRunner.parser, stepVariables)
 	if err != nil {
 		if !code.IsErrorPredefined(err) {
 			err = errors.Wrap(code.MobileUIValidationError, err.Error())

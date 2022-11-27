@@ -41,6 +41,7 @@ const (
 	SelectorLabel      string = "ui_label"
 	SelectorOCR        string = "ui_ocr"
 	SelectorImage      string = "ui_image"
+	ScenarioType       string = "scenario_type"
 	AssertionExists    string = "exists"
 	AssertionNotExists string = "not_exists"
 
@@ -398,6 +399,11 @@ func (dExt *DriverExt) IsImageExist(text string) bool {
 	return err == nil
 }
 
+func (dExt *DriverExt) IsScenarioType(scenarioType string) bool {
+	_, _, _, _, err := dExt.FindImageRectInUIKit(scenarioType)
+	return err == nil
+}
+
 var errActionNotImplemented = errors.New("UI action not implemented")
 
 func (dExt *DriverExt) DoAction(action MobileAction) error {
@@ -709,6 +715,8 @@ func (dExt *DriverExt) DoValidation(check, assert, expected string, message ...s
 		result = (dExt.IsOCRExist(expected) == exists)
 	case SelectorImage:
 		result = (dExt.IsImageExist(expected) == exists)
+	case ScenarioType:
+		result, _ = dExt.ScenarioDetect(expected)
 	}
 
 	if !result {
